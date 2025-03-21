@@ -203,7 +203,7 @@ const FireworkContainer: React.FC<{ active: boolean }> = ({ active }) => {
 };
 
 
-export function HeroScrollSection() {
+export default function HeroScrollSection() {
   const [imageError, setImageError] = useState(false);
   const titleRef = useRef(null);
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -223,6 +223,7 @@ export function HeroScrollSection() {
     today: number;
     vocabulary: number;
   }>({ ai: 1, today: 2, vocabulary: 0 });
+  const [isMobile, setIsMobile] = React.useState(true); // Default to mobile for SSR
 
   // 스크롤 감지 추가
   useEffect(() => {
@@ -246,6 +247,18 @@ export function HeroScrollSection() {
       today: 2, // 오늘의 학습 항상 두 번째
       vocabulary: 0 // 모바일에서는 표시하지 않음
     });
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // 애니메이션 딜레이 계산 함수
@@ -395,43 +408,43 @@ export function HeroScrollSection() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* 오늘의 학습 섹션 */}
-                {(window.innerWidth > 768 || mobileOrder.today > 0) && (
+                {(!isMobile || mobileOrder.today > 0) && (
                   <motion.div 
                     ref={todaysSectionRef}
-                    className={`bg-white p-6 rounded-xl shadow-sm border border-gray-100 ${window.innerWidth <= 768 ? `order-${mobileOrder.today}` : 'md:order-1'}`}
+                    className={`bg-white p-6 rounded-xl shadow-sm border border-gray-100 ${isMobile ? `order-${mobileOrder.today}` : 'md:order-1'}`}
                     initial={{ opacity: 0, y: 50 }}
-                    animate={window.innerWidth <= 768 ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }) : { opacity: 1, y: 0 }}
+                    animate={isMobile ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }) : { opacity: 1, y: 0 }}
                     transition={{ 
                       duration: 0.4,
-                      delay: window.innerWidth <= 768 ? 0 : getAnimationDelay('today', false),
+                      delay: isMobile ? 0 : getAnimationDelay('today', false),
                       ease: "easeOut"
                     }}
                   >
                     <motion.h3 
                       className="font-medium text-gray-800 mb-2"
                       initial={{ opacity: 0, x: -20 }}
-                      animate={window.innerWidth <= 768 ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }) : { opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: window.innerWidth <= 768 ? 0.1 : getAnimationDelay('today', false) + 0.1 }}
+                      animate={isMobile ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }) : { opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: isMobile ? 0.1 : getAnimationDelay('today', false) + 0.1 }}
                     >오늘의 학습</motion.h3>
                     <motion.div 
                       className="h-32 bg-gray-50 rounded-lg mb-4"
                       initial={{ opacity: 0, scale: 0.95 }}
-                      animate={window.innerWidth <= 768 ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }) : { opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: window.innerWidth <= 768 ? 0.2 : getAnimationDelay('today', false) + 0.2 }}
+                      animate={isMobile ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }) : { opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: isMobile ? 0.2 : getAnimationDelay('today', false) + 0.2 }}
                     ></motion.div>
                     <motion.div 
                       className="flex justify-between items-center"
                       initial={{ opacity: 0, y: 10 }}
-                      animate={window.innerWidth <= 768 ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }) : { opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: window.innerWidth <= 768 ? 0.3 : getAnimationDelay('today', false) + 0.3 }}
+                      animate={isMobile ? (isTodaysSectionInView || hasScrolled ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }) : { opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: isMobile ? 0.3 : getAnimationDelay('today', false) + 0.3 }}
                     >
                       <span className="text-sm text-gray-500">진행률: 65%</span>
                       <div className="h-2 w-32 bg-gray-100 rounded-full">
                         <motion.div 
                           className="h-2 bg-blue-500 rounded-full"
                           initial={{ width: 0 }}
-                          animate={window.innerWidth <= 768 ? (isTodaysSectionInView || hasScrolled ? { width: "65%" } : { width: 0 }) : { width: "65%" }}
-                          transition={{ duration: 0.5, delay: window.innerWidth <= 768 ? 0.4 : getAnimationDelay('today', false) + 0.4 }}
+                          animate={isMobile ? (isTodaysSectionInView || hasScrolled ? { width: "65%" } : { width: 0 }) : { width: "65%" }}
+                          transition={{ duration: 0.5, delay: isMobile ? 0.4 : getAnimationDelay('today', false) + 0.4 }}
                         ></motion.div>
                       </div>
                     </motion.div>
@@ -439,14 +452,14 @@ export function HeroScrollSection() {
                 )}
                 
                 {/* 내 단어장 섹션 */}
-                {(window.innerWidth > 768 || mobileOrder.vocabulary > 0) && (
+                {(isMobile || mobileOrder.vocabulary > 0) && (
                   <motion.div 
-                    className={`bg-white p-6 rounded-xl shadow-sm border border-gray-100 ${window.innerWidth <= 768 ? `order-${mobileOrder.vocabulary}` : 'md:order-2'}`}
+                    className={`bg-white p-6 rounded-xl shadow-sm border border-gray-100 ${isMobile ? `order-${mobileOrder.vocabulary}` : 'md:order-2'}`}
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ 
                       duration: 0.4,
-                      delay: getAnimationDelay('vocabulary', window.innerWidth <= 768),
+                      delay: getAnimationDelay('vocabulary', isMobile),
                       ease: "easeOut"
                     }}
                   >
@@ -454,14 +467,14 @@ export function HeroScrollSection() {
                       className="font-medium text-gray-800 mb-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', window.innerWidth <= 768) + 0.1 }}
+                      transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', isMobile) + 0.1 }}
                     >내 단어장</motion.h3>
                     <div className="space-y-3">
                       <motion.div 
                         className="flex justify-between items-center p-2 bg-gray-50 rounded-lg"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', window.innerWidth <= 768) + 0.2 }}
+                        transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', isMobile) + 0.2 }}
                       >
                         <span>serendipity</span>
                         <span className="text-sm text-gray-500">우연한 발견</span>
@@ -470,7 +483,7 @@ export function HeroScrollSection() {
                         className="flex justify-between items-center p-2 bg-gray-50 rounded-lg"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', window.innerWidth <= 768) + 0.3 }}
+                        transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', isMobile) + 0.3 }}
                       >
                         <span>ephemeral</span>
                         <span className="text-sm text-gray-500">덧없는</span>
@@ -479,7 +492,7 @@ export function HeroScrollSection() {
                         className="flex justify-between items-center p-2 bg-gray-50 rounded-lg"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', window.innerWidth <= 768) + 0.4 }}
+                        transition={{ duration: 0.3, delay: getAnimationDelay('vocabulary', isMobile) + 0.4 }}
                       >
                         <span>quintessential</span>
                         <span className="text-sm text-gray-500">전형적인</span>
@@ -490,12 +503,12 @@ export function HeroScrollSection() {
                 
                 {/* AI 번역 기능 섹션 */}
                 <motion.div 
-                  className={`md:col-span-2 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl shadow-sm border border-blue-100 ${window.innerWidth <= 768 ? `order-${mobileOrder.ai}` : 'md:order-3'}`}
+                  className={`md:col-span-2 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl shadow-sm border border-blue-100 ${isMobile ? `order-${mobileOrder.ai}` : 'md:order-3'}`}
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ 
                     duration: 0.4,
-                    delay: getAnimationDelay('ai', window.innerWidth <= 768),
+                    delay: getAnimationDelay('ai', isMobile),
                     ease: "easeOut"
                   }}
                 >
@@ -503,14 +516,14 @@ export function HeroScrollSection() {
                     className="font-medium text-gray-800 mb-4"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: getAnimationDelay('ai', window.innerWidth <= 768) + 0.1 }}
+                    transition={{ duration: 0.3, delay: getAnimationDelay('ai', isMobile) + 0.1 }}
                   >AI 번역 기능</motion.h3>
                   <div className="flex flex-col md:flex-row gap-4 items-center">
                     <motion.div 
                       className="w-full md:flex-1 bg-white p-4 rounded-lg shadow-sm"
                       initial={{ opacity: 0, x: -30 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: getAnimationDelay('ai', window.innerWidth <= 768) + 0.2 }}
+                      transition={{ duration: 0.4, delay: getAnimationDelay('ai', isMobile) + 0.2 }}
                     >
                       <p className="text-gray-800 mb-2">The quintessential example of serendipity is...</p>
                       <div className="h-6 w-24 bg-gray-100 rounded-full"></div>
@@ -519,7 +532,7 @@ export function HeroScrollSection() {
                       className="flex items-center justify-center"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ duration: 0.3, delay: getAnimationDelay('ai', window.innerWidth <= 768) + 0.3 }}
+                      transition={{ duration: 0.3, delay: getAnimationDelay('ai', isMobile) + 0.3 }}
                     >
                       <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                         <div className="h-5 w-5 rounded-full bg-blue-500"></div>
@@ -529,7 +542,7 @@ export function HeroScrollSection() {
                       className="w-full md:flex-1 bg-white p-4 rounded-lg shadow-sm"
                       initial={{ opacity: 0, x: 30 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: getAnimationDelay('ai', window.innerWidth <= 768) + 0.4 }}
+                      transition={{ duration: 0.4, delay: getAnimationDelay('ai', isMobile) + 0.4 }}
                     >
                       <p className="text-gray-800 mb-2">우연한 발견의 전형적인 예는...</p>
                       <div className="h-6 w-24 bg-gray-100 rounded-full"></div>
