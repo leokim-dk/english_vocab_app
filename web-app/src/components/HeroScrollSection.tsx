@@ -202,8 +202,7 @@ const FireworkContainer: React.FC<{ active: boolean }> = ({ active }) => {
   );
 };
 
-
-export default function HeroScrollSection() {
+const HeroScrollSection = () => {
   const [imageError, setImageError] = useState(false);
   const titleRef = useRef(null);
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -223,7 +222,7 @@ export default function HeroScrollSection() {
     today: number;
     vocabulary: number;
   }>({ ai: 1, today: 2, vocabulary: 0 });
-  const [isMobile, setIsMobile] = React.useState(true); // Default to mobile for SSR
+  const [isMobile, setIsMobile] = React.useState(true);
 
   // 스크롤 감지 추가
   useEffect(() => {
@@ -452,7 +451,7 @@ export default function HeroScrollSection() {
                 )}
                 
                 {/* 내 단어장 섹션 */}
-                {(isMobile || mobileOrder.vocabulary > 0) && (
+                {(!isMobile || mobileOrder.vocabulary > 0) && (
                   <motion.div 
                     className={`bg-white p-6 rounded-xl shadow-sm border border-gray-100 ${isMobile ? `order-${mobileOrder.vocabulary}` : 'md:order-2'}`}
                     initial={{ opacity: 0, y: 50 }}
@@ -556,4 +555,6 @@ export default function HeroScrollSection() {
       </ContainerScroll>
     </div>
   );
-} 
+};
+
+export default HeroScrollSection; 
