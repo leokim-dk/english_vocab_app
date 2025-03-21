@@ -222,13 +222,17 @@ export const Card = ({
   translate: MotionValue<number>;
   children: React.ReactNode;
 }) => {
-  const [screenWidth, setScreenWidth] = React.useState(0);
-  const [marginTop, setMarginTop] = React.useState(-28);
-  const [aspectRatio, setAspectRatio] = React.useState('aspect-[0.7/1]');
+  // Initialize with default values for SSR
+  const [screenWidth, setScreenWidth] = React.useState(768); // Default to tablet breakpoint
+  const [marginTop, setMarginTop] = React.useState(-180); // Default margin for tablet
+  const [aspectRatio, setAspectRatio] = React.useState('aspect-[0.7/1]'); // Default aspect ratio
 
   // 화면 크기에 따라 마진과 비율 계산
-  const updateDimensions = React.useCallback((width: number) => {
+  const updateDimensions = React.useCallback(() => {
     if (typeof window === 'undefined') return;
+    
+    const width = window.innerWidth;
+    setScreenWidth(width);
     
     // 모든 화면 크기에서 화면 비율에 따른 동적 마진 계산
     let marginScale = 0.4; // 모바일 비율은 그대로 유지
@@ -272,22 +276,16 @@ export const Card = ({
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setScreenWidth(width);
-      updateDimensions(width);
-    };
-
+    
     // 초기 설정
-    handleResize();
+    updateDimensions();
 
     // 리사이즈 이벤트 리스너 등록
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', updateDimensions);
     
     // 정리 함수
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', updateDimensions);
     };
   }, [updateDimensions]);
 
