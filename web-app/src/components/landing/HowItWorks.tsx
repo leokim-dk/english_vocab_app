@@ -21,6 +21,8 @@ export function HowItWorks() {
 
   // 초기 로드 시 scrollProgress 초기화
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     setScrollProgress(0);
     
     // CSS 애니메이션 관련 스타일 추가
@@ -44,6 +46,8 @@ export function HowItWorks() {
 
   // 스크롤 애니메이션 관찰 설정
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const options = {
       root: null,
       rootMargin: '-10% 0px -10% 0px',
@@ -88,6 +92,8 @@ export function HowItWorks() {
 
   // 스크롤 위치에 따른 연결선 이동 처리
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const section = howItWorksRef.current;
     const line = lineRef.current;
     if (!section || !line) return;
