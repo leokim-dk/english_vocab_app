@@ -334,7 +334,7 @@ export default function HeroScrollSection() {
   };
 
   return (
-    <div className="flex flex-col overflow-hidden pb-10 relative">
+    <div id="hero" className="flex flex-col overflow-hidden pb-10 relative">
       {/* 폭죽 애니메이션 - 양쪽에서 동시에 등장 */}
       {fireworksTriggered && fireworkPositions.map((position, index) => (
         <div key={index} className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>

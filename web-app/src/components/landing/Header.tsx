@@ -8,10 +8,15 @@ export function Header() {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // 섹션 스크롤 핸들러
   const scrollToSection = (sectionId: string) => {
     if (typeof window === 'undefined') return;
+    
+    setIsNavigating(true);
+    setIsNavVisible(true);
+    setActiveSection(sectionId); // 클릭 시 바로 active 섹션 설정
     
     const element = document.getElementById(sectionId);
     if (element) {
@@ -23,6 +28,11 @@ export function Header() {
         top: offsetPosition,
         behavior: 'smooth'
       });
+      
+      // 스크롤 애니메이션이 끝난 후에 isNavigating을 false로 설정
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 1000); // 스크롤 애니메이션 시간보다 약간 길게 설정
     }
   };
 
@@ -31,6 +41,9 @@ export function Header() {
     if (typeof window === 'undefined') return;
 
     const handleScroll = () => {
+      // 네비게이션 중에는 헤더 숨김 처리를 하지 않음
+      if (isNavigating) return;
+      
       const currentScrollY = window.scrollY;
       
       // 네비게이션 표시/숨김 처리
@@ -48,13 +61,13 @@ export function Header() {
       setLastScrollY(currentScrollY);
       
       // 현재 섹션 감지
-      const sections = ['home', 'features', 'how-it-works', 'faq'];
+      const sections = ['hero', 'features', 'how-it-works', 'faq'];
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
           const rect = element.getBoundingClientRect();
           if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section);
+            setActiveSection(section === 'hero' ? 'home' : section);
             break;
           }
         }
@@ -63,7 +76,7 @@ export function Header() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, isNavigating]);
 
   const openExternalLink = (url: string) => {
     if (typeof window !== 'undefined') {
@@ -84,10 +97,10 @@ export function Header() {
         </div>
         <nav className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 space-x-6">
           <a 
-            href="#" 
+            href="#hero" 
             onClick={(e) => {
               e.preventDefault();
-              scrollToSection('home');
+              scrollToSection('hero');
             }}
             className={`relative text-gray-600 hover:text-blue-600 transition-colors ${
               activeSection === 'home' ? 'text-blue-600 font-medium' : ''
