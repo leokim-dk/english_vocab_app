@@ -202,7 +202,7 @@ const FireworkContainer: React.FC<{ active: boolean }> = ({ active }) => {
   );
 };
 
-function HeroScrollSection() {
+export default function HeroScrollSection() {
   const [imageError, setImageError] = useState(false);
   const titleRef = useRef(null);
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -555,6 +555,4 @@ function HeroScrollSection() {
       </ContainerScroll>
     </div>
   );
-}
-
-export default HeroScrollSection; 
+} 
