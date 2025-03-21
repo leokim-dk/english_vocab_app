@@ -202,11 +202,8 @@ const FireworkContainer: React.FC<{ active: boolean }> = ({ active }) => {
   );
 };
 
-interface HeroScrollSectionProps {
-  onRegisterClick: () => void;
-}
 
-export function HeroScrollSection({ onRegisterClick }: HeroScrollSectionProps) {
+export function HeroScrollSection() {
   const [imageError, setImageError] = useState(false);
   const titleRef = useRef(null);
   const spanRef = useRef<HTMLSpanElement>(null);

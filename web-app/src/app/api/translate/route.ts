@@ -19,40 +19,6 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 기본적인 번역 사전 (API 실패시 폴백용)
-const basicDictionary: Record<string, string> = {
-  // 한국어 -> 영어
-  '안녕하세요': 'Hello',
-  '안녕': 'Hi',
-  '감사합니다': 'Thank you',
-  '고맙습니다': 'Thank you',
-  '네': 'Yes',
-  '아니오': 'No',
-  '프로그래밍': 'Programming',
-  
-  // 영어 -> 한국어
-  'hello': '안녕하세요',
-  'hi': '안녕',
-  'thank you': '감사합니다',
-  'thanks': '고마워요',
-  'yes': '네',
-  'no': '아니오',
-  'programming': '프로그래밍'
-};
-
-// 사전에서 번역 찾기 (폴백 메커니즘)
-function findInDictionary(text: string, from: string, to: string): string | null {
-  const lowerText = text.toLowerCase();
-  
-  if (from === 'ko' && to === 'en') {
-    return basicDictionary[text] || null;
-  } else if (from === 'en' && to === 'ko') {
-    return basicDictionary[lowerText] || null;
-  }
-  
-  return null;
-}
-
 // Together AI를 사용하여 번역하는 함수
 async function translateWithTogetherAI(text: string, from: string, to: string): Promise<string> {
   console.log(`[Server] Translating using Together AI: "${text}" from ${from} to ${to}`);
@@ -60,13 +26,6 @@ async function translateWithTogetherAI(text: string, from: string, to: string): 
   // API 키가 없으면 오류 발생
   if (!TOGETHER_API_KEY) {
     throw new Error('TOGETHER_API_KEY is not defined in environment variables');
-  }
-  
-  // 먼저 사전에서 번역 시도
-  const dictionaryResult = findInDictionary(text, from, to);
-  if (dictionaryResult) {
-    console.log(`[Server] Found translation in dictionary: "${dictionaryResult}"`);
-    return dictionaryResult;
   }
   
   // 시스템 메시지와 사용자 메시지 생성
@@ -195,9 +154,16 @@ export async function POST(request: Request) {
     const timeSinceLastRequest = now - lastRequestTime;
     
     if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
-      const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
-      console.log(`[Server] Rate limiting: waiting ${waitTime}ms before next request`);
-      await delay(waitTime);
+      // 너무 빠른 요청인 경우 429 상태 코드와 함께 에러 반환
+      return NextResponse.json({
+        error: 'Too many requests. Please wait a moment before trying again.',
+        retryAfter: MIN_REQUEST_INTERVAL - timeSinceLastRequest
+      }, { 
+        status: 429,
+        headers: {
+          'Retry-After': `${Math.ceil((MIN_REQUEST_INTERVAL - timeSinceLastRequest) / 1000)}`
+        }
+      });
     }
     
     // 요청 시간 업데이트
@@ -218,7 +184,7 @@ export async function POST(request: Request) {
     } catch (translateError: Error | unknown) {
       console.error('[Server] Translation API error:', translateError instanceof Error ? translateError.message : translateError);
       
-      // 요청 제한 감지
+      // Together AI API의 요청 제한 감지
       const isRateLimited = 
         translateError instanceof Error && translateError.message && (
           translateError.message.includes('429') || 
@@ -226,22 +192,26 @@ export async function POST(request: Request) {
           translateError.message.includes('rate limit')
         );
       
-      // 번역 실패 시 오류 메시지 반환
+      if (isRateLimited) {
+        return NextResponse.json({
+          error: 'Translation service is busy. Please try again in a few seconds.',
+          retryAfter: MIN_REQUEST_INTERVAL
+        }, { 
+          status: 429,
+          headers: {
+            'Retry-After': '1'
+          }
+        });
+      }
+      
       return NextResponse.json({
-        translatedText: from === 'en' 
-          ? `[${text}의 한국어 번역]` 
-          : `[English translation of ${text}]`,
-        from,
-        to,
-        error: isRateLimited 
-          ? 'Rate limit exceeded, please try again later' 
-          : 'Translation service unavailable'
-      }, { status: isRateLimited ? 429 : 503 });
+        error: 'Translation service is temporarily unavailable. Please try again later.'
+      }, { status: 503 });
     }
   } catch (error: Error | unknown) {
     console.error('[Server] Request processing error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: 'An unexpected error occurred while processing your request.' },
       { status: 500 }
     );
   }
