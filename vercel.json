@@ -1,0 +1,9 @@
+{
+  "rootDirectory": "web-app",
+  "builds": [
+    {
+      "src": "web-app/**",
+      "use": "@vercel/next"
+    }
+  ]
+} 
