@@ -13,14 +13,26 @@ export const ContainerScroll = ({
   const { scrollYProgress } = useScroll({
     target: containerRef,
   });
-  const [isMobile, setIsMobile] = React.useState(false);
+  
+  // Initialize with default values for SSR
+  const [isMobile, setIsMobile] = React.useState(true); // Default to mobile for SSR
+  const [dimensions, setDimensions] = React.useState({
+    scale: [0.7, 0.95] as [number, number],
+    translate: [0, -100] as [number, number]
+  });
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const isMobileView = window.innerWidth <= 768;
+      setIsMobile(isMobileView);
+      setDimensions({
+        scale: isMobileView ? [0.7, 0.95] : [1.05, 1],
+        translate: isMobileView ? [0, -100] : [0, -200]
+      });
     };
+    
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => {
@@ -28,17 +40,9 @@ export const ContainerScroll = ({
     };
   }, []);
 
-  const scaleDimensions = () => {
-    return isMobile ? [0.7, 0.95] : [1.05, 1];
-  };
-
   const rotate = useTransform(scrollYProgress, [0, 1], [20, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], scaleDimensions());
-  const translate = useTransform(
-    scrollYProgress, 
-    [0, 0.5],
-    isMobile ? [0, -100] : [0, -200]
-  );
+  const scale = useTransform(scrollYProgress, [0, 1], dimensions.scale);
+  const translate = useTransform(scrollYProgress, [0, 0.5], dimensions.translate);
   
   // 배경 요소들의 속성을 미리 계산하여 저장
   const circles = useMemo(() => {
@@ -296,7 +300,12 @@ export const Card = ({
         scale,
         boxShadow:
           "0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003",
-        marginTop: `${marginTop}px`,
+      }}
+      animate={{
+        marginTop: marginTop
+      }}
+      initial={{
+        marginTop: -180 // SSR 초기값과 동일하게 설정
       }}
       className={`max-w-5xl mx-auto h-[48rem] md:h-[43.5rem] ${aspectRatio} w-full border-4 border-border p-2 md:p-6 bg-background rounded-[30px] shadow-2xl bg-white`}
     >
