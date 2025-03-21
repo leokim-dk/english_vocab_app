@@ -82,7 +82,7 @@ export function Header() {
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold">E</div>
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">영어 단어장</span>
         </div>
-        <nav className="hidden md:flex space-x-6">
+        <nav className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 space-x-6">
           <a 
             href="#" 
             onClick={(e) => {

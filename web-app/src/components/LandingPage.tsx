@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Header } from '@/components/landing/Header';
-import { HeroScrollSection } from '@/components/HeroScrollSection';
+import HeroScrollSection from '@/components/HeroScrollSection';
 import { Features } from '@/components/landing/Features';
 import { HowItWorks } from '@/components/landing/HowItWorks';
 import { UserExperience } from '@/components/landing/UserExperience';
