@@ -226,6 +226,8 @@ export function HeroScrollSection() {
 
   // 스크롤 감지 추가
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => {
       if (window.scrollY > 10) { // 아주 작은 스크롤에도 반응
         setHasScrolled(true);

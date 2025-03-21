@@ -4,16 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
 export function Header() {
-
-
   // 네비게이션 상태 관리
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
 
-
   // 섹션 스크롤 핸들러
   const scrollToSection = (sectionId: string) => {
+    if (typeof window === 'undefined') return;
+    
     const element = document.getElementById(sectionId);
     if (element) {
       const offset = 80; // 헤더 높이만큼 오프셋
@@ -29,6 +28,8 @@ export function Header() {
 
   // 스크롤 이벤트 핸들러
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
@@ -64,7 +65,11 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-
+  const openExternalLink = (url: string) => {
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank');
+    }
+  };
 
   return (
     <header 
@@ -142,7 +147,7 @@ export function Header() {
         <div className="space-x-2">
           <Button 
             variant="outline" 
-            onClick={() => window.open('https://apps.apple.com/app/id_here', '_blank')}
+            onClick={() => openExternalLink('https://apps.apple.com/app/id_here')}
             className="border-blue-200 hover:bg-blue-50 hover:text-blue-700 transition-all"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -152,7 +157,7 @@ export function Header() {
           </Button>
           <Button 
             variant="primary"
-            onClick={() => window.open('https://play.google.com/store/apps/details?id=id_here', '_blank')}
+            onClick={() => openExternalLink('https://play.google.com/store/apps/details?id=id_here')}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
