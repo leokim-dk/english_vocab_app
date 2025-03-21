@@ -1,9 +1,4 @@
 {
-  "root": "web-app",
-  "builds": [
-    {
-      "src": "web-app/**",
-      "use": "@vercel/next"
-    }
-  ]
+  "buildCommand": "cd web-app && npm run build",
+  "outputDirectory": "web-app/.next"
 } 
