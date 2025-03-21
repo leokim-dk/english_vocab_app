@@ -222,36 +222,14 @@ export const Card = ({
   translate: MotionValue<number>;
   children: React.ReactNode;
 }) => {
-  // 화면 크기에 따른 세밀한 조정을 위한 상태 추가
   const [screenWidth, setScreenWidth] = React.useState(0);
-  const [marginTop, setMarginTop] = React.useState(-28); // px 값으로 변경
+  const [marginTop, setMarginTop] = React.useState(-28);
   const [aspectRatio, setAspectRatio] = React.useState('aspect-[0.7/1]');
 
-  React.useEffect(() => {
-    // 초기 설정
-    if (typeof window !== 'undefined') {
-      setScreenWidth(window.innerWidth);
-      updateDimensions(window.innerWidth);
-    }
-
-    // 리사이즈 이벤트 핸들러
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setScreenWidth(width);
-      updateDimensions(width);
-    };
-
-    // 리사이즈 이벤트 리스너 등록
-    window.addEventListener('resize', handleResize);
-    
-    // 정리 함수
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   // 화면 크기에 따라 마진과 비율 계산
-  const updateDimensions = (width: number) => {
+  const updateDimensions = React.useCallback((width: number) => {
+    if (typeof window === 'undefined') return;
+    
     // 모든 화면 크기에서 화면 비율에 따른 동적 마진 계산
     let marginScale = 0.4; // 모바일 비율은 그대로 유지
     let dynamicMargin;
@@ -277,28 +255,41 @@ export const Card = ({
     
     // 데스크톱에서는 최소 및 최대 마진 값 설정
     if (width > 768) {
-      if (dynamicMargin < 70) {
-        dynamicMargin = 70; // 최소 마진 70px
-      } else if (dynamicMargin > 110) { // 최대 마진 110px
-        dynamicMargin = 110; // 최대 마진 110px
-      }
+      dynamicMargin = Math.max(70, Math.min(110, dynamicMargin));
     }
     // 중형 모바일에서는 최소 및 최대 마진 값 설정
     else if (width <= 768 && width > 390) {
-      if (dynamicMargin < 150) {
-        dynamicMargin = 180; // 최소 마진 150px
-      } else if (dynamicMargin > 215) { // 최대 마진을 200px에서 210px로 변경
-        dynamicMargin = 215; // 최대 마진 210px
-      }
+      dynamicMargin = Math.max(180, Math.min(215, dynamicMargin));
     }
     // 소형 모바일에서는 최소 마진 값 설정
-    else if (width <= 390 && dynamicMargin < 120) {
-      dynamicMargin = 120;
+    else if (width <= 390) {
+      dynamicMargin = Math.max(120, dynamicMargin);
     }
     
     // px 값으로 저장 (음수로 저장)
     setMarginTop(-dynamicMargin);
-  };
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setScreenWidth(width);
+      updateDimensions(width);
+    };
+
+    // 초기 설정
+    handleResize();
+
+    // 리사이즈 이벤트 리스너 등록
+    window.addEventListener('resize', handleResize);
+    
+    // 정리 함수
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [updateDimensions]);
 
   return (
     <motion.div
@@ -307,17 +298,12 @@ export const Card = ({
         scale,
         boxShadow:
           "0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003",
-        marginTop: `${marginTop}px`, // inline style로 마진 적용
+        marginTop: `${marginTop}px`,
       }}
       className={`max-w-5xl mx-auto h-[48rem] md:h-[43.5rem] ${aspectRatio} w-full border-4 border-border p-2 md:p-6 bg-background rounded-[30px] shadow-2xl bg-white`}
     >
       <div className="h-full w-full overflow-hidden rounded-2xl bg-muted md:rounded-2xl md:p-4">
-        {/* 실제 콘텐츠만 아래로 내리기 위한 추가 div */}
-        <div 
-          style={{
-            paddingTop: '0px', // 패딩 제거하여 원래 위치로 복원
-          }}
-        >
+        <div style={{ paddingTop: '0px' }}>
           {children}
         </div>
       </div>
