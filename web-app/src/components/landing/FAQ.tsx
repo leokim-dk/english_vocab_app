@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
-export function FAQ() {
+export default function FAQ() {
   // FAQ 아코디언 상태 관리
   const [openFAQs, setOpenFAQs] = useState<number[]>([]);
 

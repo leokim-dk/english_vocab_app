@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import { ContainerScroll } from "./container-scroll-animation";
 import Image from "next/image";
 import { motion, useAnimation, useInView } from "framer-motion";
 

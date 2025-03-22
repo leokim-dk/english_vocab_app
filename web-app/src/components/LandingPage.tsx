@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Header } from '@/components/landing/Header';
-import HeroScrollSection from '@/components/HeroScrollSection';
-import { Features } from '@/components/landing/Features';
-import { HowItWorks } from '@/components/landing/HowItWorks';
-import { UserExperience } from '@/components/landing/UserExperience';
-import { FAQ } from '@/components/landing/FAQ';
-import { CTA } from '@/components/landing/CTA';
-import { Footer } from '@/components/landing/Footer';
+import Header from './landing/Header';
+import HeroScrollSection from './landing/Hero/index';
+import Features from './landing/Features';
+import HowItWorks from './landing/HowItWorks';
+import UserExperience from './landing/UserExperience';
+import FAQ from './landing/FAQ';
+import CTA from './landing/CTA';
+import Footer from './landing/Footer';
 
 export function LandingPage() {
   

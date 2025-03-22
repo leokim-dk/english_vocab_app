@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
-export function CTA() {
+export default function CTA() {
   return (
     <section id="cta" className="py-24 bg-blue-600 text-white text-center">
       <div className="container mx-auto px-4">

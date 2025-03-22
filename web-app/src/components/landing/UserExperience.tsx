@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function UserExperience() {
+export default function UserExperience() {
   return (
     <section className="py-28 lg:py-36 bg-gradient-to-br from-blue-50 via-indigo-50 to-white relative overflow-hidden">
       {/* 배경 장식 요소 */}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Features() {
+export default function Features() {
   return (
     <section id="features" className="py-16 lg:py-24 bg-white relative overflow-hidden">
       {/* 배경 장식 요소 */}

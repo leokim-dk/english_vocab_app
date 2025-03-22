@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Footer() {
+export default function Footer() {
   return (
     <footer className="py-28 bg-gradient-to-br from-gray-900 to-gray-800 text-gray-300 relative overflow-hidden">
       {/* 배경 장식 요소 */}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
-export function HowItWorks() {
+export default function HowItWorks() {
   // 스크롤 애니메이션 상태 관리
   const [visibleSteps, setVisibleSteps] = useState<boolean[]>([false, false, false, false]);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(-1);
