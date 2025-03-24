@@ -15,6 +15,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
   String? _error;
 
+  // Define colors
+  final Color primaryBlue = const Color(0xFF1F81E2);
+
   Future<void> _signInWithGoogle() async {
     if (_isLoading) return;
 
@@ -56,38 +59,135 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('로그인'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_error != null) ...[
-              Text(
-                _error!,
-                style: const TextStyle(color: Colors.red),
-              ),
-              const SizedBox(height: 16),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              primaryBlue.withOpacity(0.7),  // 살짝 옅은 파란색
+              primaryBlue,                    // 원래 파란색
+              Color(0xFF1873D0),             // 살짝 더 진한 파란색
             ],
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : _signInWithGoogle,
-                icon: const Icon(Icons.g_mobiledata),
-                label: const Text('Google로 로그인'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black87,
+            stops: const [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+                      
+                      // Logo
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.book,
+                          color: primaryBlue,
+                          size: 40,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 32),
+                      
+                      // Welcome Text
+                      const Text(
+                        'Welcome to\nVocabulary App',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                          color: Colors.white,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      // Subtitle
+                      const Text(
+                        'Master English vocabulary\nwith our innovative learning platform',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                          height: 1.5,
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 40),
+                      
+                      // Error message if any
+                      if (_error != null) ...[
+                        Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
-            if (_isLoading) ...[
-              const SizedBox(height: 16),
-              const CircularProgressIndicator(),
-            ],
+            
+            // Bottom fixed content
+            Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'By continuing, you agree to our Privacy Policy and Terms of Service',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _signInWithGoogle,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Color(0xFF1F81E2),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: primaryBlue,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Continue with Google',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
