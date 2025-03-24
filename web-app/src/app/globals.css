@@ -4,7 +4,7 @@
 
 /* Custom breakpoints */
 @theme {
-  --breakpoint-xs: 450px; /* Example: Create a new breakpoint */
+  --breakpoint-xs: 480px; /* Example: Create a new breakpoint */
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;

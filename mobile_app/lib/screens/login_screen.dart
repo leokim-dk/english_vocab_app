@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -10,27 +11,12 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _codeController = TextEditingController();
   final _authService = AuthService();
-  
   bool _isLoading = false;
-  bool _codeSent = false;
   String? _error;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _codeController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _sendVerificationCode() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      setState(() => _error = '이메일을 입력해주세요');
-      return;
-    }
+  Future<void> _signInWithGoogle() async {
+    if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
@@ -38,39 +24,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     try {
-      await _authService.requestVerificationCode(email);
-      setState(() => _codeSent = true);
-    } catch (e) {
-      setState(() => _error = e.toString());
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _verifyCode() async {
-    final email = _emailController.text.trim();
-    final code = _codeController.text.trim();
-
-    if (code.isEmpty) {
-      setState(() => _error = '인증 코드를 입력해주세요');
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      await _authService.verifyCode(email, code);
-      // 로그인 성공 후 메인 화면으로 이동
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
+      print('Attempting to sign in with Google...');
+      final session = await _authService.signInWithGoogle();
+      print('Sign in successful, session: ${session?.user.email}');
+      
+      if (!mounted) return;
+      
+      if (session != null) {
+        print('Session obtained, navigating to home screen...');
+        context.go('/');
+      } else {
+        setState(() {
+          _error = '로그인에 실패했습니다. 다시 시도해주세요.';
+        });
       }
     } catch (e) {
-      setState(() => _error = e.toString());
+      print('Error in login screen: $e');
+      if (!mounted) return;
+      
+      setState(() {
+        _error = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
+        print('Error message set: $_error');
+      });
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -85,35 +64,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: '이메일',
-                hintText: '이메일 주소를 입력하세요',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.emailAddress,
-              enabled: !_codeSent,
-            ),
-            const SizedBox(height: 16),
-            if (_codeSent) ...[
-              TextField(
-                controller: _codeController,
-                decoration: const InputDecoration(
-                  labelText: '인증 코드',
-                  hintText: '6자리 인증 코드를 입력하세요',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                maxLength: 6,
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: _isLoading ? null : _sendVerificationCode,
-                child: const Text('인증 코드 다시 받기'),
-              ),
-            ],
-            const SizedBox(height: 16),
             if (_error != null) ...[
               Text(
                 _error!,
@@ -123,18 +73,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ],
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoading
-                    ? null
-                    : (_codeSent ? _verifyCode : _sendVerificationCode),
+              child: ElevatedButton.icon(
+                onPressed: _isLoading ? null : _signInWithGoogle,
+                icon: const Icon(Icons.g_mobiledata),
+                label: const Text('Google로 로그인'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black87,
                 ),
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : Text(_codeSent ? '인증하기' : '인증 코드 받기'),
               ),
             ),
+            if (_isLoading) ...[
+              const SizedBox(height: 16),
+              const CircularProgressIndicator(),
+            ],
           ],
         ),
       ),

@@ -45,5 +45,26 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.562502868390-3h5falvulc33bk6gdd587e4v3s95aanv</string>
+				<string>com.dongkuk.englishvocab</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>io.supabase.englishvocab</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>auth.englishvocab</string>
+		</dict>
+	</array>
+	
 </dict>
 </plist>
